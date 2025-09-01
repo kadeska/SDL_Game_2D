@@ -1,0 +1,6 @@
+.git
+.vs
+out
+.gitattributes
+CMakePresets.json
+CMakeUserPresets.json

@@ -1,0 +1,16 @@
+﻿# CMakeList.txt : CMake project for SDL_Game_2D, include source and define
+# project specific logic here.
+#
+
+find_package(SDL3 REQUIRED)
+
+# Add source to this project's executable.
+add_executable (SDL_Game_2D "SDL_Game_2D.cpp" "SDL_Game_2D.h")
+
+if (CMAKE_VERSION VERSION_GREATER 3.12)
+  set_property(TARGET SDL_Game_2D PROPERTY CXX_STANDARD 20)
+endif()
+
+target_link_libraries(SDL_Game_2D PRIVATE SDL3::SDL3)
+
+# TODO: Add tests and install targets if needed.
