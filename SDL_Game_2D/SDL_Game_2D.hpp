@@ -8,13 +8,29 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
+#include <array>
 
-#include "animation.hpp"
+#include "gameObject.hpp"
 
 struct SDLState {
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+	GameState gs;
 	int width, height, logW, logH;
+};
+
+const size_t LAYER_IDL_LEVEL = 0;
+const size_t LAYER_IDL_CHARACTERS = 1;
+
+struct GameState
+{
+	std::array<std::vector<GameObject>, 2> layers;
+	int playerIndex;
+
+	GameState()
+	{
+		playerIndex = 0; // will change when loading maps
+	}
 };
 
 struct Resources 
@@ -63,6 +79,7 @@ bool flipHorizontal = false;
 
 bool initializeSDLWindowAndRenderer(SDLState& state);
 bool mainGameLoop(SDLState& state);
+void drawObject(const SDLState& state, GameState& gs, GameObject& obj, float deltaTime);
 void cleanup(SDLState& state);
 
 // TODO: Reference additional headers your program requires here.
