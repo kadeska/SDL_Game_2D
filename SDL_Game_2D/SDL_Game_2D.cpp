@@ -2,6 +2,7 @@
 //
 
 #include "SDL_Game_2D.h"
+
 #include <chrono>
 
 
@@ -19,8 +20,7 @@ int main(int argc, char* argv[])
 	if (!initializeSDLWindowAndRenderer(state)) { return 1; }
 	
 	// load game assets
-	texIdle = IMG_LoadTexture(state.renderer, "data/idle.png");
-	SDL_SetTextureScaleMode(texIdle, SDL_SCALEMODE_NEAREST);
+	resources.load(state);
 
 	// setup game data
 	
@@ -36,7 +36,8 @@ int main(int argc, char* argv[])
 	}
 	
 
-	SDL_DestroyTexture(texIdle);
+	//SDL_DestroyTexture(texIdle);
+	resources.unload();
 	cleanup(state);
 	return 0;
 }
@@ -108,8 +109,8 @@ bool mainGameLoop(SDLState& state) {
 
 		// handle movement
 		float moveAmount = 0;
-		if (keys[SDL_SCANCODE_A]) { moveAmount += -100.0f; }
-		if (keys[SDL_SCANCODE_D]) { moveAmount += 100.0f; }
+		if (keys[SDL_SCANCODE_A]) { moveAmount += -100.0f; flipHorizontal = true; }
+		if (keys[SDL_SCANCODE_D]) { moveAmount += 100.0f; flipHorizontal = false; }
 		playerX += (moveAmount * deltaTime);
 		//std::cout << "Player X: " << playerX << std::endl;
 		//std::cout << "Delta Time: " << deltaTime << std::endl;
@@ -124,7 +125,8 @@ bool mainGameLoop(SDLState& state) {
 		SDL_FRect src{ .x = 0, .y = 0, .w = spriteSize, .h = spriteSize };
 		SDL_FRect dst{ .x = playerX, .y = floor - spriteSize, .w = spriteSize, .h = spriteSize };
 
-		SDL_RenderTexture(state.renderer, texIdle, &src, &dst); // draw texture
+		//SDL_RenderTexture(state.renderer, texIdle, &src, &dst); // draw texture
+		SDL_RenderTextureRotated(state.renderer, resources.texIdle, &src, &dst, 0, nullptr, (flipHorizontal) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 
 		// swap buffers and present
 		SDL_RenderPresent(state.renderer);
