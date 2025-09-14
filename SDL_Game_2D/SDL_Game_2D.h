@@ -15,6 +15,11 @@ struct SDLState {
 };
 
 SDL_Texture* texIdle = nullptr;
+float playerX;
+//float floor;
+float spriteSize;
+const bool* keys;
+//uint64_t prevTime;
 
 bool initializeSDLWindowAndRenderer(SDLState& state);
 bool mainGameLoop(SDLState& state);

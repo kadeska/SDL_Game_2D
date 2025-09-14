@@ -2,8 +2,7 @@
 //
 
 #include "SDL_Game_2D.h"
-
-//using namespace std;
+#include <chrono>
 
 
 int main(int argc, char* argv[])
@@ -23,11 +22,17 @@ int main(int argc, char* argv[])
 	texIdle = IMG_LoadTexture(state.renderer, "data/idle.png");
 	SDL_SetTextureScaleMode(texIdle, SDL_SCALEMODE_NEAREST);
 
+	// setup game data
+	
+	playerX = 150;
+	//const float floor = state.logH;
+	
+
 	// start game loop
 	if (!mainGameLoop(state)) { 
 		//SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error in main game loop", state.window);
 		std::cout << "Game loop closed" << std::endl;
-		return 1; 
+		return 0; 
 	}
 	
 
@@ -67,10 +72,23 @@ bool initializeSDLWindowAndRenderer(SDLState& state) {
 	return initSuccess;
 }
 
+
 bool mainGameLoop(SDLState& state) {
+	const bool* keys = SDL_GetKeyboardState(nullptr);
+	auto lastFrameTime = std::chrono::high_resolution_clock::now();
+
+	//uint64_t prevTime = SDL_GetTicks();
+	//prevTime = SDL_GetTicks();
 	bool running = true;
 	while (running)
 	{
+		auto currentFrameTime = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> deltaTimeDuration = currentFrameTime - lastFrameTime;
+		float deltaTime = deltaTimeDuration.count();
+		lastFrameTime = currentFrameTime;
+
+		//uint64_t nowTime = SDL_GetTicks();
+		//float deltaTime = nowTime - prevTime / 20000.0f; // convert to seconeds
 		SDL_Event event{ 0 };
 		while (SDL_PollEvent(&event))
 		{
@@ -88,17 +106,30 @@ bool mainGameLoop(SDLState& state) {
 			}
 		}
 
+		// handle movement
+		float moveAmount = 0;
+		if (keys[SDL_SCANCODE_A]) { moveAmount += -100.0f; }
+		if (keys[SDL_SCANCODE_D]) { moveAmount += 100.0f; }
+		playerX += (moveAmount * deltaTime);
+		//std::cout << "Player X: " << playerX << std::endl;
+		//std::cout << "Delta Time: " << deltaTime << std::endl;
+		//std::cout << "MoveAmount: " << moveAmount << std::endl;
+
 		// draw commands
 		SDL_SetRenderDrawColor(state.renderer, 20, 10, 30, 255); // set clear color
 		SDL_RenderClear(state.renderer); // clear screen
 
-		SDL_FRect src{ .x = 0, .y = 0, .w = 32, .h = 32 };
-		SDL_FRect dst{ .x = 0, .y = 0, .w = 32, .h = 32 };
+		const float floor = state.logH;
+		const float spriteSize = 32;
+		SDL_FRect src{ .x = 0, .y = 0, .w = spriteSize, .h = spriteSize };
+		SDL_FRect dst{ .x = playerX, .y = floor - spriteSize, .w = spriteSize, .h = spriteSize };
 
 		SDL_RenderTexture(state.renderer, texIdle, &src, &dst); // draw texture
 
 		// swap buffers and present
 		SDL_RenderPresent(state.renderer);
+		//prevTime = nowTime;
+
 	}
 
 	return running;
